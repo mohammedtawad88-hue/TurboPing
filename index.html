@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TurboPing — Gaming Latency & Network Optimizer</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Custom Frameless Titlebar -->
+  <header class="titlebar">
+    <div class="brand">
+      <img src="assets/icon.png" class="brand-img" alt="TurboPing">
+      <span class="brand-name">TurboPing</span>
+      <span class="brand-tag" data-i18n="appSubtitle">Gaming Optimizer</span>
+    </div>
+
+    <div class="titlebar-center">
+      <div class="status-indicator" id="globalStatusPill">
+        <span class="status-dot"></span>
+        <span id="globalStatusText" data-i18n="statusChecking">Checking System...</span>
+      </div>
+    </div>
+
+    <div class="titlebar-right">
+      <button class="btn-lang" id="btnLangToggle">🇮🇶 العربية</button>
+      <div class="window-controls">
+        <button class="win-btn" id="btnMin">−</button>
+        <button class="win-btn" id="btnMax">□</button>
+        <button class="win-btn win-close" id="btnClose">✕</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <nav class="nav-menu">
+        <button class="nav-item active" data-tab="dashboard">
+          <span class="nav-icon">⚡</span>
+          <span class="nav-text" data-i18n="navDashboard">Quick Boost</span>
+        </button>
+        <button class="nav-item" data-tab="dns">
+          <span class="nav-icon">🌐</span>
+          <span class="nav-text" data-i18n="navDNS">DNS Benchmark</span>
+        </button>
+        <button class="nav-item" data-tab="mtu">
+          <span class="nav-icon">📦</span>
+          <span class="nav-text" data-i18n="navMTU">MTU Tuning</span>
+        </button>
+        <button class="nav-item" data-tab="radar">
+          <span class="nav-icon">🎯</span>
+          <span class="nav-text" data-i18n="navRadar">Game Radar</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="adapter-selector-box">
+          <label data-i18n="activeAdapter">Active Network Adapter:</label>
+          <select id="selectAdapter" class="adapter-select">
+            <option value="" data-i18n="detectingAdapters">Detecting...</option>
+          </select>
+        </div>
+        <button class="btn-restore" id="btnRestoreDefaults" data-i18n="btnRestoreDefaults">
+          ↺ Restore Windows Defaults
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Panels -->
+    <main class="content-panel">
+
+      <!-- TAB 1: DASHBOARD -->
+      <section class="tab-content active" id="tab-dashboard">
+        <div class="dashboard-hero">
+          <div class="boost-center">
+            <div class="pulse-ring"></div>
+            <div class="pulse-ring-outer"></div>
+            <button class="btn-boost" id="btnBoostNow">
+              <div class="boost-icon">⚡</div>
+              <div class="boost-label" id="boostButtonLabel" data-i18n="btnBoostNow">BOOST GAMING NOW</div>
+              <div class="boost-sub" data-i18n="btnBoostSub">Click to eliminate latency</div>
+            </button>
+          </div>
+
+          <!-- Speed & Latency Gauge Card -->
+          <div class="gauge-card">
+            <div class="gauge-header">
+              <span class="gauge-title" data-i18n="liveLatencyHeader">Real-Time Gateway Latency</span>
+              <span class="gauge-badge" id="latencyQualityBadge">NORMAL</span>
+            </div>
+            <div class="gauge-metric">
+              <span class="metric-val" id="metricPingVal">--</span>
+              <span class="metric-unit">ms</span>
+            </div>
+            <div class="gauge-details">
+              <div class="detail-col">
+                <span class="detail-label" data-i18n="jitterLabel">Jitter</span>
+                <span class="detail-val" id="metricJitterVal">±0 ms</span>
+              </div>
+              <div class="detail-col">
+                <span class="detail-label" data-i18n="packetLossLabel">Packet Loss</span>
+                <span class="detail-val" id="metricLossVal">0.0%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tweak Status Grid -->
+        <div class="tweaks-grid">
+          <div class="tweak-card" id="cardNagle">
+            <div class="tweak-icon">⚡</div>
+            <div class="tweak-info">
+              <div class="tweak-title" data-i18n="tweakNagleTitle">Nagle's Algorithm (TCP NoDelay)</div>
+              <div class="tweak-desc" data-i18n="tweakNagleDesc">Eliminates the 200ms packet acknowledgement buffer.</div>
+            </div>
+            <span class="tweak-status badge-off" id="statusNagle">DISABLED</span>
+          </div>
+
+          <div class="tweak-card" id="cardThrottling">
+            <div class="tweak-icon">🚀</div>
+            <div class="tweak-info">
+              <div class="tweak-title" data-i18n="tweakThrottlingTitle">Network Throttling Disable</div>
+              <div class="tweak-desc" data-i18n="tweakThrottlingDesc">Forces Windows not to throttle gaming packets.</div>
+            </div>
+            <span class="tweak-status badge-off" id="statusThrottling">DISABLED</span>
+          </div>
+
+          <div class="tweak-card" id="cardResponsiveness">
+            <div class="tweak-icon">🎮</div>
+            <div class="tweak-info">
+              <div class="tweak-title" data-i18n="tweakRespTitle">100% Gaming CPU Priority</div>
+              <div class="tweak-desc" data-i18n="tweakRespDesc">Dedicates 100% network CPU scheduling to games.</div>
+            </div>
+            <span class="tweak-status badge-off" id="statusResponsiveness">DISABLED</span>
+          </div>
+
+          <div class="tweak-card" id="cardRSS">
+            <div class="tweak-icon">📡</div>
+            <div class="tweak-info">
+              <div class="tweak-title" data-i18n="tweakRSSTitle">Receive-Side Scaling (RSS)</div>
+              <div class="tweak-desc" data-i18n="tweakRSSDesc">Distributes network loads across all CPU cores.</div>
+            </div>
+            <span class="tweak-status badge-off" id="statusRSS">DISABLED</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: DNS BENCHMARK -->
+      <section class="tab-content" id="tab-dns">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title" data-i18n="dnsTitle">Live Gaming DNS Benchmark</h2>
+            <p class="section-desc" data-i18n="dnsDesc">Test response times to the world's fastest gaming resolvers and apply the lowest latency DNS.</p>
+          </div>
+          <div class="section-actions">
+            <button class="btn btn-secondary" id="btnBenchmarkDNS" data-i18n="btnBenchmarkDNS">🔄 Run Benchmark</button>
+            <button class="btn btn-primary" id="btnApplyFastestDNS" data-i18n="btnApplyFastestDNS">⚡ Apply Fastest DNS</button>
+            <button class="btn btn-outline" id="btnResetDNS" data-i18n="btnResetDNS">↺ Reset to ISP/DHCP</button>
+          </div>
+        </div>
+
+        <div class="dns-table-container">
+          <table class="data-table" id="dnsTable">
+            <thead>
+              <tr>
+                <th data-i18n="colProvider">Provider</th>
+                <th data-i18n="colPrimary">Primary DNS</th>
+                <th data-i18n="colSecondary">Secondary DNS</th>
+                <th data-i18n="colPing">Latency</th>
+                <th data-i18n="colAction">Action</th>
+              </tr>
+            </thead>
+            <tbody id="dnsTableBody">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 3: MTU TUNING -->
+      <section class="tab-content" id="tab-mtu">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title" data-i18n="mtuTitle">MTU Auto-Discovery & Packet Loss Fix</h2>
+            <p class="section-desc" data-i18n="mtuDesc">Probes your router & ISP gateway to find the unfragmented packet threshold, eliminating packet loss and stuttering.</p>
+          </div>
+        </div>
+
+        <div class="mtu-box-container">
+          <div class="mtu-card">
+            <div class="mtu-graphic">📦</div>
+            <div class="mtu-status-label" data-i18n="calculatedMTULabel">Optimal MTU Size</div>
+            <div class="mtu-value" id="dispOptimalMTU">1500</div>
+            <div class="mtu-sub" id="dispMTUStatus" data-i18n="mtuReady">Ready to scan gateway</div>
+            <div class="mtu-actions">
+              <button class="btn btn-primary" id="btnScanMTU" data-i18n="btnScanMTU">🔍 Detect Optimal MTU</button>
+              <button class="btn btn-secondary" id="btnApplyMTU" data-i18n="btnApplyMTU">⚡ Apply to Adapter</button>
+            </div>
+          </div>
+
+          <div class="mtu-explanation">
+            <h3 data-i18n="mtuWhyTitle">Why MTU Matters in Gaming?</h3>
+            <p data-i18n="mtuWhyText">If your MTU is too large, your gaming packets get fragmented into two smaller packets. If even one piece is delayed or dropped, the game server drops your shot or causes rubber-banding. Finding the exact unfragmented MTU guarantees 100% clean packet delivery.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: GAME RADAR -->
+      <section class="tab-content" id="tab-radar">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title" data-i18n="radarTitle">Competitive Game Server Radar</h2>
+            <p class="section-desc" data-i18n="radarDesc">Live ping response times to Middle East and European competitive game servers.</p>
+          </div>
+          <button class="btn btn-secondary" id="btnRefreshRadar" data-i18n="btnRefreshRadar">🔄 Refresh Ping</button>
+        </div>
+
+        <div class="games-grid" id="gamesGrid">
+          <!-- Populated dynamically -->
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Notification Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
